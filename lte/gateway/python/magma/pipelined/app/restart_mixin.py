@@ -12,12 +12,15 @@ limitations under the License.
 """
 from __future__ import annotations
 
+import logging
 from abc import ABCMeta, abstractmethod
 from asyncio import Future
 from logging import Logger
 from typing import Callable, Dict, List, Optional
 
+from lte.protos.mconfig import mconfigs_pb2
 from lte.protos.pipelined_pb2 import SetupFlowsResult
+from magma.common.service import MagmaService
 from magma.pipelined.app.base import ControllerNotReadyException
 from magma.pipelined.app.startup_flows import StartupFlows
 from magma.pipelined.openflow import flows
@@ -126,7 +129,13 @@ class RestartMixin(metaclass=ABCMeta):
                 tbl,
                 [flow.match for flow in startup_flows_map[tbl]],
             )
-        self._remove_extra_flows(startup_flows_map)
+        service = MagmaService('pipelined', mconfigs_pb2.PipelineD())
+        service_config = service.config
+
+        if ((self.APP_NAME == "enforcement") and (service_config['redis_enabled'] == True)):
+            logging.info("skipping removal of enforcement flows since it is in stateless mode")
+        else:
+            self._remove_extra_flows(startup_flows_map)
 
         self.finish_init(requests)
         self.init_finished = True
