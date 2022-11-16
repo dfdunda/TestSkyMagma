@@ -314,10 +314,10 @@ jobs:
               echo "MAGMA_VERSION=${magma_version}" >> $GITHUB_ENV
           fi
 
-      - name: Set dry run environment variable
-        if: ${{ ! ( github.event_name == 'push' && github.repository_owner == 'magma' && github.ref_name == 'master' ) }}
-        run: |
-          echo "IS_DRY=--dry-run" >> $GITHUB_ENV
+      # - name: Set dry run environment variable
+      #   if: ${{ ! ( github.event_name == 'push' && github.repository_owner == 'magma' && github.ref_name == 'master' ) }}
+      #   run: |
+      #     echo "IS_DRY=--dry-run" >> $GITHUB_ENV
 
       - name: Setup JFROG CLI - linuxfoundation
         uses: jfrog/setup-jfrog-cli@d0a59b1cdaeeb16e65b5039fc92b8507337f1559 # pin@v3
